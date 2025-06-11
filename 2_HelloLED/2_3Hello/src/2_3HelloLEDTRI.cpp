@@ -13,6 +13,7 @@
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
 const int LED = D1;
+const int LED2 = D16;
 const int LEDDELAY = 10;
 int i;
 
@@ -23,10 +24,12 @@ void setup() {
 void loop() {
   for(i = 0; i < 256; i++){
     analogWrite(LED,i);
+    analogWrite(LED2,255-i);
     delay(LEDDELAY);
   }
   for(i = 255; i >= 0; i--){
     analogWrite(LED,i);
+    analogWrite(LED2,i+255);
     delay(LEDDELAY);
   }
 }
