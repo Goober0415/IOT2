@@ -14,7 +14,7 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 
 const int LED = D6;
 const int BUTTON = D3;
-bool isPressed;
+bool isPressed, onOff;
 
 void setup() {
 Serial.begin(9600);
@@ -27,10 +27,13 @@ pinMode(LED,OUTPUT);
 void loop() {
 isPressed = digitalRead(BUTTON);
 if(isPressed == true){
-  Serial.printf("Button pressed\n");
-  digitalWrite(LED, LOW);
+ onOff != onOff; 
+ Serial.printf("Button pressed\n");
+}
+if (onOff == true){
+ digitalWrite(LED, HIGH);
 }else{
   Serial.printf(".\n");
-  digitalWrite(LED, HIGH);
+  digitalWrite(LED, LOW);
 }
 }
