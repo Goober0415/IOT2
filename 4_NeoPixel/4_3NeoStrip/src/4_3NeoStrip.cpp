@@ -112,6 +112,19 @@ void loop()
   
     pixel.show();
     delay(100);
+    j++;
+  }
+
+  for( int i = 0; i < PIXELCOUNT; i++){
+    j= 0;
+    if (j < 7){
+      pixel.setPixelColor(i,rainbow[j]);
+      pixel.show();
+    }else{
+      j = 0;
+      pixel.setPixelColor(i,rainbow[j]);
+      pixel.show();
+    }
   }
   // pixel.clear();
   // if (j == 6){
