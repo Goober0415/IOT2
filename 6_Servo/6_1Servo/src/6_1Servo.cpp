@@ -7,17 +7,34 @@
  */
 
 #include "Particle.h"
+#include "math.h"
+#include "Button.h"
+
+//global variables
+const int PWM = D16, BUTTON = D1;;
+
+float sine;
+bool Switch,click;
+
+//objects
+Button Btn(BUTTON);
+Servo myServo;
+
 
 SYSTEM_MODE(SEMI_AUTOMATIC);
 
-Servo myServo;
-
 void setup() {
-  myServo.attach(A2); //PWM
+  myServo.attach(PWM);
 }
 
 void loop() {
-  myServo.write(180);
-  
-  
+  Switch = digitalRead(BUTTON);
+  sine = 90*sin(2*M_PI*(1/5.0)*millis()/1000.0)+90;
+
+if (Btn.isClicked()){
+   click = !click;
+}
+if (click == true){
+   myServo.write(sine);
+}
 }
