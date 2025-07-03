@@ -13,6 +13,8 @@ SYSTEM_MODE(AUTOMATIC);
 // Define constants for keypad configuration
 const byte ROWS = 4;
 const byte COLS = 4;
+unsigned int currentTime = millis();
+unsigned int lastTime;
 
 // Define the keypad layout
 char hexaKeys[ROWS][COLS] = {
@@ -41,12 +43,7 @@ const int GREEN_LED_PIN = D6;
 
 Servo myServo;
 
-bool compareCodes(const char* code1, const char* code2, int length) {
-    for(int i = 0; i < length; i++) {
-        if(code1[i] != code2[i]) return false;
-    }
-    return true;
-}
+bool compareCodes(const char* code1, const char* code2, int length);
 
 void setup() {
     Serial.begin(9600);
@@ -86,10 +83,12 @@ void loop() {
                 digitalWrite(GREEN_LED_PIN, HIGH);
                 
                 // Auto-lock after 5 seconds
-                delay(5000);
+               if((currentTime - lastTime)>5000){
                 myServo.write(180);
                 digitalWrite(RED_LED_PIN, HIGH);
                 digitalWrite(GREEN_LED_PIN, LOW);
+                currentTime = lastTime;
+               }
             } else {
                 Serial.println("Incorrect code!");
                 // Flash red LED three times
@@ -114,4 +113,11 @@ void loop() {
         codeIndex = 0;
         Serial.println("Code entry cleared");
     }
+}
+
+bool compareCodes(const char* code1, const char* code2, int length) {
+    for(int i = 0; i < length; i++) {
+        if(code1[i] != code2[i]) return false;
+    }
+    return true;
 }
