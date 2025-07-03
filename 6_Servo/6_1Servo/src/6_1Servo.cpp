@@ -11,10 +11,10 @@
 #include "Button.h"
 
 //global variables
-const int PWM = D16, BUTTON = D1;;
+const int PWM = D16, BUTTON = D1;
 
 float sine;
-bool Switch,click;
+bool Switch;
 
 //objects
 Button Btn(BUTTON);
@@ -28,7 +28,6 @@ void setup() {
 }
 
 void loop() {
-  Switch = digitalRead(BUTTON);
   sine = 90*sin(2*M_PI*(1/5.0)*millis()/1000.0)+90;
 
 if (Btn.isClicked()){
