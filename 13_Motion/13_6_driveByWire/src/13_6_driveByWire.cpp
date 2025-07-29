@@ -9,62 +9,56 @@
 #include "Particle.h"
 #include "Stepper.h"
 
+// Let Device OS manage the connection to the Particle Cloud
 SYSTEM_MODE(AUTOMATIC);
-const signed int SPR = 2048;             // Steps per revolution
-const float SLOPE = 0.0076, DELTAT = 50; // Delay time in milliseconds
-const int HEXADDRESS = 0x68;             // MPU6050 I2C address
-unsigned currentTime = millis();
-int lastTime, steps;
-byte gyro_z_l, gyro_z_h;
 
-float angVZ, deltaAngle;
+// Run the application and system concurrently in separate threads
+SYSTEM_THREAD(ENABLED);
 
-Stepper myStepper(SPR, A1, A5, A2, S4);
-
-void setup()
-{
+// Show system, cloud connectivity, and application logs over USB
+// View logs with CLI using 'particle serial monitor --follow'
+SerialLogHandler logHandler(LOG_LEVEL_INFO);
+const int MPUADDR = 0x68;
+byte gyroZh, gyroZL;
+int16_t gyroZ;
+float angularVelocity, degree, steps;
+const int DELTAT = 100;
+unsigned int lastTime;
+Stepper stepper(2048, D3, D4, D5, D6);
+// setup() runs once, when the device is first turned on
+void setup() {
+  // Put initialization like pinMode and begin functions here
+  //bigStepper.setSpeed(12);
   Wire.begin();
-  Wire.beginTransmission(HEXADDRESS);
-  Wire.write(0x6B); // Power management register
-  Wire.write(0x00); // Reset the sensor
+  //Begin transmission to MPU-6050
+  Wire.beginTransmission(MPUADDR);
+  //Select and write to PWR_MGMT1 register
+  Wire.write(0x47);
+  Wire.write(0x00);//Wakes up MPU-6050
+  //End transmission and close connection
   Wire.endTransmission(true);
-
-  Wire.beginTransmission(HEXADDRESS);
-  Wire.write(0x47); // Gyroscope configuration register
-  Wire.write(0x00); // Set full scale range to ±250 °/s
-  Wire.endTransmission(true);
-
-  myStepper.setSpeed(10);
 }
 
-void loop()
-{
-  if ((currentTime - lastTime) < DELTAT)
-  {
-    // Read gyroscope data
-    Wire.beginTransmission(HEXADDRESS);
-    Wire.write(0x47); // Start at register
+// loop() runs over and over again, as quickly as it can execute.
+void loop() {
+  if((millis()-lastTime) > DELTAT){
+    lastTime = millis();
+    Wire.beginTransmission(MPUADDR);
+    Wire.write(0x47);
     Wire.endTransmission(false);
-    Wire.requestFrom(HEXADDRESS, 6, true);
-    gyro_z_h = Wire.read();
-    gyro_z_l = Wire.read();
-    float gyro_z = (gyro_z_h << 8 | gyro_z_l); // Convert to °/s
 
-    Serial.printf("angvz: %.2f\n", gyro_z);
+    Wire.requestFrom(MPUADDR, 2, true);
+    gyroZh = Wire.read();
+    gyroZL = Wire.read();
 
-    angVZ = gyro_z / 131.0f;
-    Serial.printf("angvz**: %.2f\n", angVZ);
-
-    deltaAngle = angVZ * DELTAT / 1000.0f;
-    Serial.printf("deltaAngle: %.2f\n", deltaAngle);
-    steps = deltaAngle * (2048 / 360.0f); // 0.17? or 5.68
-
-    if (deltaAngle > 25 || deltaAngle < -25)
-    {
-      myStepper.step(steps);
-      Serial.printf("steps = %i\n", steps);
-      delay(100);
-    }
+    gyroZ = gyroZh << 8 | gyroZL; //bit shift
+    Serial.printf("Z Gyro: %i\n", gyroZ);
+    angularVelocity = (1/131.0)*gyroZ; //angular velocity
+    degree = w_z * (DELTAT/1000.0); // per second
+    steps = (2048/360.0)*degree; // steps based on the degree read
+    stepper.setSpeed(12);
+    stepper.step(steps);
   }
-  lastTime = currentTime;
+  
+
 }

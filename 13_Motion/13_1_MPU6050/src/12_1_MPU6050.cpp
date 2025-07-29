@@ -12,10 +12,10 @@
 SYSTEM_MODE(AUTOMATIC);
 
 const float ACCEL_SCALE_FACTOR = 16384.0; // Default for ±2g range
-const float GRAVITY = 9.80665;            // Standard gravity in m/s^2
 
 byte accel_x_h, accel_x_l, accel_y_h, accel_y_l, accel_z_h, accel_z_l;
 float accel_x, accel_y, accel_z;
+unsigned int currentTime = millis(), lastTime;
 
 void setup()
 {
@@ -44,6 +44,7 @@ void loop()
 
   if (Wire.available() == 6)
   {
+    if (currentTime - lastTime < 1000){
     accel_x_h = Wire.read();
     accel_x_l = Wire.read();
     accel_y_h = Wire.read();
@@ -51,18 +52,20 @@ void loop()
     accel_z_h = Wire.read();
     accel_z_l = Wire.read();
 
-    accel_x = ((accel_x_h << 8 | accel_x_l) / ACCEL_SCALE_FACTOR) * GRAVITY;
-    accel_y = ((accel_y_h << 8 | accel_y_l) / ACCEL_SCALE_FACTOR) * GRAVITY;
-    accel_z = ((accel_z_h << 8 | accel_z_l) / ACCEL_SCALE_FACTOR) * GRAVITY;
+    accel_x = ((accel_x_h << 8 | accel_x_l) / ACCEL_SCALE_FACTOR);
+    accel_y = ((accel_y_h << 8 | accel_y_l) / ACCEL_SCALE_FACTOR);
+    accel_z = ((accel_z_h << 8 | accel_z_l) / ACCEL_SCALE_FACTOR);
 
-    Serial.printf("X-axis acceleration: %.2f g\n", accel_x / GRAVITY);
-    Serial.printf("Y-axis acceleration: %.2f g\n", accel_y / GRAVITY);
-    Serial.printf("Z-axis acceleration: %.2f g\n", accel_z / GRAVITY);
+    Serial.printf("X-axis acceleration: %.2f g\n", accel_x );
+    Serial.printf("Y-axis acceleration: %.2f g\n", accel_y );
+    Serial.printf("Z-axis acceleration: %.2f g\n", accel_z );
+    lastTime = currentTime;
   }
   else
   {
-    Serial.println("Error reading from MPU6050");
+    Serial.printf("Error reading from MPU6050");
+     lastTime = currentTime;
   }
 
-  delay(1000); // Adjust as needed
+  }
 }

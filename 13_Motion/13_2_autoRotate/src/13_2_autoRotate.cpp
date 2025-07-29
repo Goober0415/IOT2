@@ -8,9 +8,8 @@
 
 // Include Particle Device OS APIs
 #include "Particle.h"
-#include "Wire.h"
 #include "Adafruit_SSD1306.h"
-#include "Adafruit_GFX_RK.h"
+#include "Adafruit_GFX.h"
 
 SYSTEM_MODE(AUTOMATIC);
 
@@ -62,9 +61,9 @@ void loop()
     accel_z_h = Wire.read();
     accel_z_l = Wire.read();
 
-    accel_x = ((accel_x_h << 8 | accel_x_l) / ACCEL_SCALE_FACTOR) * GRAVITY;
-    accel_y = ((accel_y_h << 8 | accel_y_l) / ACCEL_SCALE_FACTOR) * GRAVITY;
-    accel_z = ((accel_z_h << 8 | accel_z_l) / ACCEL_SCALE_FACTOR) * GRAVITY;
+    accel_x = ((accel_x_h << 8 | accel_x_l) / ACCEL_SCALE_FACTOR);
+    accel_y = ((accel_y_h << 8 | accel_y_l) / ACCEL_SCALE_FACTOR);
+    accel_z = ((accel_z_h << 8 | accel_z_l) / ACCEL_SCALE_FACTOR);
 
     int rotation = getRotation(accel_x, accel_y, accel_z);
 
@@ -79,9 +78,9 @@ void loop()
     display.display();
     delay(1000);
 
-    Serial.printf("X-axis acceleration: %.2f g\n", accel_x / GRAVITY);
-    Serial.printf("Y-axis acceleration: %.2f g\n", accel_y / GRAVITY);
-    Serial.printf("Z-axis acceleration: %.2f g\n", accel_z / GRAVITY);
+    Serial.printf("X-axis acceleration: %.2f g\n", accel_x);
+    Serial.printf("Y-axis acceleration: %.2f g\n", accel_y);
+    Serial.printf("Z-axis acceleration: %.2f g\n", accel_z);
   }
   else
   {
