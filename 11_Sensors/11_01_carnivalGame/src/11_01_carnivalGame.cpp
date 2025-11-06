@@ -1,7 +1,7 @@
 /*
  * Project Carnival Game
- * Author: Jamie Gavina
- * Date:
+ * Author: Jamie Dowden-Duarte
+ * Date:updated 11/6/2025
  * For comprehensive documentation and examples, please visit:
  * https://docs.particle.io/firmware/best-practices/firmware-template/
  */
@@ -27,17 +27,13 @@ void setup()
   waitFor(Serial.isConnected, 10000);
 
   pixel.begin();
-  pixel.show();
-  delay(50);
-  pixel.clear();
   pinMode(PIEZO_PIN, INPUT);
 }
 
 void loop()
 {
   maxValue = 0;
-  pixel.clear();
-  pixel.show();
+
   for (i = 0; i < 100; i++)
   {
     int pValue = analogRead(PIEZO_PIN);
