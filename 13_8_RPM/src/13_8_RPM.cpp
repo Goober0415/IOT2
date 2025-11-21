@@ -17,40 +17,33 @@ unsigned int pulses = 0, currentTime = millis(), lastTime;
 static unsigned int lastMagnetPass = 0, interval = 60000; // 60 seconds
 
 void checkRPM();
-void onSensorChange();
+int returnRPM(pulses);
 
 Adafruit_SSD1306 display(OLEDRESET);
-Timer rpmTimer(interval, checkRPM);
 
 void setup()
 {
   display.begin(SSD1306_SWITCHCAPVCC, ADDY);
   pinMode(HALL_PIN, INPUT_PULLUP);
-  rpmTimer.start();
-  attachInterrupt(HALL_PIN, onSensorChange, CHANGE);
+  attachInterupt(HALL_PIN, checkRPM, RISING);
 }
 
 void loop()
 {
-  if ((currentTime - lastTime) > interval)
-    checkRPM();
-  lastTime = currentTime;
+  if ((lastTime - currentTime) > interval)
+  {
+    Serial.printf(returnRPM(pulses));
+    pulses = 0;
+  }
 }
 
-void onSensorChange()
+int returnRPM(pulses)
 {
-  unsigned long currentTime = millis();
-  if (currentTime > lastMagnetPass)
-  {
-    pulses++;
-    lastMagnetPass = currentTime;
-  }
+  int RPM = pulses / 60000.0;
+  return RPM;
 }
 
 void checkRPM()
 {
-  float rpm = 60000 / lastMagnetPass;
-  display.printf(rpm);
-  pulses = 0;
-  lastMagnetPass = millis();
+  pulses++;
 }
